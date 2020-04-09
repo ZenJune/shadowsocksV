@@ -34,6 +34,9 @@ namespace Shadowsocks.Controller
             {
                 CloseLogFile();
 
+                var IsNotConsole = Console.In == System.IO.StreamReader.Null;
+
+
                 string curpath = Path.Combine(System.Windows.Forms.Application.StartupPath, @"temp");// Path.GetFullPath(".");//Path.GetTempPath();
                 LogFilePath = curpath;
                 if (!Directory.Exists(curpath))
@@ -46,8 +49,12 @@ namespace Shadowsocks.Controller
                 _logFileStream = new FileStream(LogFile, FileMode.Append);
                 _logStreamWriter = new StreamWriterWithTimestamp(_logFileStream);
                 _logStreamWriter.AutoFlush = true;
-                Console.SetOut(_logStreamWriter);
-                Console.SetError(_logStreamWriter);
+                if (IsNotConsole)
+                {
+                    Console.SetOut(_logStreamWriter);
+                    Console.SetError(_logStreamWriter);
+                }
+
                 date = new_date;
 
                 return true;
@@ -245,7 +252,7 @@ namespace Shadowsocks.Controller
         public static void Log(LogLevel level, object s)
         {
             UpdateLogFile();
-            var strMap = new []{
+            var strMap = new[]{
                 "Debug",
                 "Info",
                 "Warn",
