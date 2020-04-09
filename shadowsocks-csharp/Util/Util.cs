@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -234,11 +235,33 @@ namespace Shadowsocks.Util
             return true;
         }
 
-        public static bool isLAN(IPAddress ipadd)
+       static  SegmentIPOrderList _SegIPList_LAN;
+        public static bool isLAN(IPAddress ip)
         {
-            return true;
-        }
+            if (_SegIPList_LAN == null)
+            {
+                _SegIPList_LAN = new SegmentIPOrderList();
+                string[] netmasks = new string[]
+                {
+                    "0.0.0.0/8",
+                    "10.0.0.0/8",
+                    //"100.64.0.0/10", //部分地区运营商貌似在使用这个，这个可能不安全
+                    "127.0.0.0/8",
+                    "169.254.0.0/16",
+                    "172.16.0.0/12",
+                    //"192.0.0.0/24",
+                    //"192.0.2.0/24",
+                    "192.168.0.0/16",
+                    //"198.18.0.0/15",
+                    //"198.51.100.0/24",
+                    //"203.0.113.0/24",
+                };
+                netmasks.ToList().ForEach(s => _SegIPList_LAN.Add(new SegmentIP(s)));
+            } 
+            var rst = _SegIPList_LAN.IsExist(ip);
+            return rst;
 
+        }
         public static bool isFromLAN(Socket socket)
         {
             return isLAN(((IPEndPoint)socket.RemoteEndPoint).Address);

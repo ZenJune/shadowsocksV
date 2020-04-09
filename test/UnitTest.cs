@@ -4,6 +4,9 @@ using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using System.Threading;
 using System.Collections.Generic;
+using System.Net;
+using System.Diagnostics;
+using Shadowsocks.Util;
 
 namespace test
 {
@@ -164,6 +167,39 @@ namespace test
                 encryptionFailed = true;
                 throw;
             }
+        }
+
+        [TestMethod]
+        public void TestUtilsIsLan_New()
+        {
+            {//debug
+                var ipadd = IPAddress.Parse("151.101.108.133");
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                for (int i = 0; i < 100000; i++)
+                {
+                    Utils.isLAN(ipadd); //debug
+                }
+                sw.Stop();
+                Console.WriteLine($"Utils.isLAN(ipadd) {sw.ElapsedMilliseconds}ms");
+            }
+        }
+        [TestMethod]
+        public void TestUtilsIsLan_old()
+        {
+
+            {//debug
+                var ipadd = IPAddress.Parse("151.101.108.133");
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                for (int i = 0; i < 100000; i++)
+                {
+                    Utils.isLAN_todel(ipadd); //debug
+                }
+                sw.Stop();
+                Console.WriteLine($"Utils.isLAN(ipadd) {sw.ElapsedMilliseconds}ms");
+            }
+
         }
     }
 }
