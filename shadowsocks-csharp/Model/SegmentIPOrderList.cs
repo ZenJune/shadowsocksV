@@ -112,7 +112,7 @@ namespace Shadowsocks.Model
             return IsReverse ? !rst : rst;
         }
 
-        internal void LoadChinaIP()
+        public void LoadChinaIP()
         {
             Load_chn_ipmask();
             Load_apnic_latest();
@@ -122,7 +122,8 @@ namespace Shadowsocks.Model
 
         void Load_chn_ipmask()
         {
-            string absFilePath = Path.Combine(System.Windows.Forms.Application.StartupPath, "chn_ipmask.txt");
+            string path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string absFilePath = Path.Combine(new Uri(path).LocalPath, "chn_ipmask.txt"); 
             if (File.Exists(absFilePath))
             {
                 try
@@ -153,7 +154,8 @@ namespace Shadowsocks.Model
 
         void Load_apnic_latest()
         {
-            string absFilePath = Path.Combine(System.Windows.Forms.Application.StartupPath, "delegated-apnic-latest.txt");
+            string path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string absFilePath = Path.Combine(new Uri(path).LocalPath, "delegated-apnic-latest.txt"); 
             if (File.Exists(absFilePath))
             {
                 try

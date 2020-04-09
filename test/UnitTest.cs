@@ -7,13 +7,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Diagnostics;
 using Shadowsocks.Util;
+using Shadowsocks.Model;
 
 namespace test
 {
     [TestClass]
     public class UnitTest
     {
-       
+
 
         private void RunEncryptionRound(IEncryptor encryptor, IEncryptor decryptor)
         {
@@ -200,6 +201,55 @@ namespace test
                 Console.WriteLine($"Utils.isLAN(ipadd) {sw.ElapsedMilliseconds}ms");
             }
 
+        }
+
+        [TestMethod]
+        public void TestIPRangeQuery_new()
+        {
+            SegmentIPOrderList iprs = new SegmentIPOrderList();
+            iprs.LoadChinaIP();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 100000; i++)
+            {
+                {
+                    var rst = iprs.IsInList(IPAddress.Parse("203.57.200.1"));
+                    Assert.IsTrue(rst);
+                }
+                {
+                    var rst = iprs.IsInList(IPAddress.Parse("202.0.184.1"));
+                    Assert.IsFalse(rst);
+                }
+            }
+            sw.Stop();
+            Console.WriteLine($"{sw.ElapsedMilliseconds}ms");
+        }
+        [TestMethod]
+        public void TestIPRangeQuery_old()
+        {
+            IPRangeSet_todel iprs = new IPRangeSet_todel();
+
+            iprs.LoadApnic("CN");
+            iprs.LoadChn();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 100000; i++)
+            {
+                {
+                    var rst = iprs.IsInIPRange(IPAddress.Parse("203.57.200.1"));
+                    Assert.IsTrue(rst);
+                }
+                {
+                    var rst = iprs.IsInIPRange(IPAddress.Parse("202.0.184.1"));
+                    Assert.IsFalse(rst);
+                }
+
+            }
+            sw.Stop();
+            Console.WriteLine($"{sw.ElapsedMilliseconds}ms");
+
+            ;
         }
 
 

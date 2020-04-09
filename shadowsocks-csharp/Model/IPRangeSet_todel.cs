@@ -8,8 +8,7 @@ namespace Shadowsocks.Model
 {
     public class IPRangeSet_todel
     {
-        private const string APNIC_FILENAME = "delegated-apnic-latest";
-        private const string APNIC_EXT_FILENAME = "delegated-apnic-extended-latest";
+        private const string APNIC_FILENAME = "delegated-apnic-latest"; 
         private const string CHN_FILENAME = "chn_ip.txt";
         private uint[] _set;
 
@@ -67,14 +66,11 @@ namespace Shadowsocks.Model
         }
 
         public bool LoadApnic(string zone)
-        {
-            string filename = APNIC_EXT_FILENAME;
-            string absFilePath = Path.Combine(System.Windows.Forms.Application.StartupPath, filename);
-            if (!File.Exists(absFilePath))
-            {
-                filename = APNIC_FILENAME;
-                absFilePath = Path.Combine(System.Windows.Forms.Application.StartupPath, filename);
-            }
+        { 
+
+            string path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string absFilePath = Path.Combine(new Uri(path).LocalPath, "delegated-apnic-latest.txt");  
+          
             if (File.Exists(absFilePath))
             {
                 try
