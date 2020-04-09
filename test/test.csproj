@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>test</RootNamespace>
     <AssemblyName>test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -48,13 +48,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ServerTest.cs" />
     <Compile Include="UnitTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\shadowsocks-csharp\shadowsocks-csharp-console.csproj">
-      <Project>{DC8929F9-CAC8-4286-8CFE-6A70EF0EF835}</Project>
-      <Name>shadowsocks-csharp-console</Name>
+    <ProjectReference Include="..\shadowsocks-csharp\shadowsocks-csharp4.0.csproj">
+      <Project>{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}</Project>
+      <Name>shadowsocks-csharp4.0</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

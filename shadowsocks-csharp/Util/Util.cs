@@ -187,7 +187,7 @@ namespace Shadowsocks.Util
             return isLocal(((IPEndPoint)socket.RemoteEndPoint).Address);
         }
 
-        public static bool isLAN(IPAddress ip)
+        public static bool isLAN_todel(IPAddress ip)
         {
             byte[] addr = ip.GetAddressBytes();
             if (addr.Length == 4)
@@ -231,6 +231,11 @@ namespace Shadowsocks.Util
                 }
                 return false;
             }
+            return true;
+        }
+
+        public static bool isLAN(IPAddress ipadd)
+        {
             return true;
         }
 
