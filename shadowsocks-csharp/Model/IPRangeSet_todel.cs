@@ -6,14 +6,14 @@ using System.Text;
 
 namespace Shadowsocks.Model
 {
-    public class IPRangeSet
+    public class IPRangeSet_todel
     {
         private const string APNIC_FILENAME = "delegated-apnic-latest";
         private const string APNIC_EXT_FILENAME = "delegated-apnic-extended-latest";
         private const string CHN_FILENAME = "chn_ip.txt";
         private uint[] _set;
 
-        public IPRangeSet()
+        public IPRangeSet_todel()
         {
             _set = new uint[256 * 256 * 8];
         }

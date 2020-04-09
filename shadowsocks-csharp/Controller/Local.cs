@@ -57,9 +57,9 @@ namespace Shadowsocks.Controller
         private delegate void InvokeHandler();
         private Configuration _config;
         private ServerTransferTotal _transfer;
-        private IPRangeSet _IPRange;
+        private SegmentIPOrderList _IPRange;
 
-        public Local(Configuration config, ServerTransferTotal transfer, IPRangeSet IPRange)
+        public Local(Configuration config, ServerTransferTotal transfer, SegmentIPOrderList IPRange)
         {
             _config = config;
             _transfer = transfer;

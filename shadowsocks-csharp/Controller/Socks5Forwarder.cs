@@ -14,12 +14,12 @@ namespace Shadowsocks.Controller
     class Socks5Forwarder : Listener.Service
     {
         private Configuration _config;
-        private IPRangeSet _IPRange;
+        private SegmentIPOrderList _IPRange;
         const int CONNECT_DIRECT = 1;
         const int CONNECT_LOCALPROXY = 2;
         const int CONNECT_REMOTEPROXY = 0;
 
-        public Socks5Forwarder(Configuration config, IPRangeSet IPRange)
+        public Socks5Forwarder(Configuration config, SegmentIPOrderList IPRange)
         {
             _config = config;
             _IPRange = IPRange;
@@ -186,7 +186,7 @@ namespace Shadowsocks.Controller
                             && ipAddress.AddressFamily == AddressFamily.InterNetwork
                             )
                         {
-                            if (_IPRange.IsInIPRange(ipAddress))
+                            if (_IPRange.IsInList(ipAddress))
                             {
                                 return CONNECT_LOCALPROXY;
                             }
@@ -201,7 +201,7 @@ namespace Shadowsocks.Controller
         class Handler
             : IHandler
         {
-            private IPRangeSet _IPRange;
+            private SegmentIPOrderList _IPRange;
             private Configuration _config;
 
             private byte[] _firstPacket;
@@ -226,7 +226,7 @@ namespace Shadowsocks.Controller
             protected object timerLock = new object();
             protected DateTime lastTimerSetTime;
 
-            public void Start(Configuration config, IPRangeSet IPRange, byte[] firstPacket, int length, Socket socket, string local_sendback_protocol, bool proxy)
+            public void Start(Configuration config, SegmentIPOrderList IPRange, byte[] firstPacket, int length, Socket socket, string local_sendback_protocol, bool proxy)
             {
                 _IPRange = IPRange;
                 _firstPacket = firstPacket;

@@ -11,10 +11,12 @@ namespace Shadowsocks.Model
     public class SegmentIPOrderList
     {
 
-
         List<SegmentIP> _list = new List<SegmentIP>();
 
         bool IsOrdered = true;
+
+        public bool IsReverse { get; set; }
+
         public void Add(SegmentIP ipr)
         {
             IsOrdered = false;
@@ -49,15 +51,18 @@ namespace Shadowsocks.Model
             IsOrdered = true;
         }
 
-        public bool IsExist(IPAddress ip)
+        bool IsInList_notrevers(IPAddress ip)
         {
+            if (_list.Count == 0)
+                return false;
+
             if (!IsOrdered)
             {
                 SortList();
             }
 
 
-            int start = 0; int end = _list.Count-1;
+            int start = 0; int end = _list.Count - 1;
             while (true)
             {
                 if (start == end)
@@ -70,6 +75,17 @@ namespace Shadowsocks.Model
                 }
 
                 var mid = (start + end) / 2;
+                {
+                    try
+                    {
+                        var compare1 = _list[mid].Compare(ip);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(1);
+                    }
+
+                }
                 var compare = _list[mid].Compare(ip);
                 if (compare > 0)
                 {
@@ -88,6 +104,12 @@ namespace Shadowsocks.Model
             }
 
             return false;
+        }
+
+        public bool IsInList(IPAddress ip)
+        {
+            var rst = IsInList_notrevers(ip);
+            return IsReverse ? !rst : rst;
         }
 
         internal void LoadChinaIP()
@@ -172,10 +194,7 @@ namespace Shadowsocks.Model
             return;
         }
 
-        internal void Reverse()
-        {
-            throw new NotImplementedException();
-        }
+
 
         private static int ParseToMask(int subnetCnt)
         {

@@ -29,7 +29,7 @@ namespace Shadowsocks.Controller
         private PACServer _pacServer;
         private Configuration _config;
         private ServerTransferTotal _transfer;
-        public IPRangeSet _rangeSet;
+        public SegmentIPOrderList _rangeSet;
 #if !_CONSOLE
         private HttpProxyRunner polipoRunner;
 #endif
@@ -89,12 +89,10 @@ namespace Shadowsocks.Controller
 
         public void ReloadIPRange()
         {
-            _rangeSet = new IPRangeSet();
-            _rangeSet.LoadChn();
-            if (_config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina)
-            {
-                _rangeSet.Reverse();
-            }
+            _rangeSet = new SegmentIPOrderList();
+            _rangeSet.LoadChinaIP(); 
+
+            _rangeSet.IsReverse = (_config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina);
         }
 
         // always return copy

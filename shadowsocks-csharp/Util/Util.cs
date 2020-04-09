@@ -258,7 +258,7 @@ namespace Shadowsocks.Util
                 };
                 netmasks.ToList().ForEach(s => _SegIPList_LAN.Add(new SegmentIP(s)));
             } 
-            var rst = _SegIPList_LAN.IsExist(ip);
+            var rst = _SegIPList_LAN.IsInList(ip);
             return rst;
 
         }

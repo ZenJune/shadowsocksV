@@ -24,7 +24,7 @@ namespace Shadowsocks.Controller
     {
         private Configuration _config;
         private ServerTransferTotal _transfer;
-        private IPRangeSet _IPRange;
+        private SegmentIPOrderList _IPRange;
 
         private byte[] _firstPacket;
         private int _firstPacketLength;
@@ -41,7 +41,7 @@ namespace Shadowsocks.Controller
 
         protected HttpPraser httpProxyState;
 
-        public ProxyAuthHandler(Configuration config, ServerTransferTotal transfer, IPRangeSet IPRange, byte[] firstPacket, int length, Socket socket)
+        public ProxyAuthHandler(Configuration config, ServerTransferTotal transfer, SegmentIPOrderList IPRange, byte[] firstPacket, int length, Socket socket)
         {
             int local_port = ((IPEndPoint)socket.LocalEndPoint).Port;
 

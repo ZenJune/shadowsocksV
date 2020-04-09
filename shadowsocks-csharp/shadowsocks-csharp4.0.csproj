@@ -161,8 +161,8 @@
     <Compile Include="Controller\PACServer.cs" />
     <Compile Include="Model\Host.cs" />
     <Compile Include="Model\SegmentIP.cs" />
-    <Compile Include="Model\IPRangeOrderList.cs" />
-    <Compile Include="Model\IPRangeSet.cs" />
+    <Compile Include="Model\SegmentIPOrderList.cs" />
+    <Compile Include="Model\IPRangeSet_todel.cs" />
     <Compile Include="Model\IPSegment.cs" />
     <Compile Include="Model\LRUCache.cs" />
     <Compile Include="Model\MinSearchTree.cs" />
