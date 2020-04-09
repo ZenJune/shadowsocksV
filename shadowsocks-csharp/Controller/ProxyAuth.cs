@@ -99,15 +99,15 @@ namespace Shadowsocks.Controller
 
         bool AuthConnection(Socket connection, string authUser, string authPass)
         {
-            if ((_config.authUser ?? "").Length == 0)
+            if (string.IsNullOrEmpty(_config.authUser))
             {
                 return true;
             }
-            if (_config.authUser == authUser && (_config.authPass ?? "") == authPass)
+            if (_config.authUser == authUser && _config.authPass == authPass)
             {
                 return true;
             }
-            if (Util.Utils.isMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8"))
+            if (Util.Utils.isFromLocal(_connection))
             {
                 return true;
             }
@@ -122,9 +122,13 @@ namespace Shadowsocks.Controller
 
                 if (bytesRead > 1)
                 {
-                    if ((!string.IsNullOrEmpty(_config.authUser) || Util.Utils.isMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8"))
-                        && _firstPacket[0] == 4 && _firstPacketLength >= 9)
+                    if (_firstPacket[0] == 4 && _firstPacketLength >= 9)
                     {
+                        if (!AuthConnection(_connection, null, null))
+                        {
+                            Close();
+                            return;
+                        }
                         RspSocks4aHandshakeReceive();
                     }
                     else if (_firstPacket[0] == 5 && _firstPacketLength >= 3)
@@ -194,87 +198,103 @@ namespace Shadowsocks.Controller
 
         private void RspSocks5HandshakeReceive()
         {
-            byte[] response = { 5, 0 };
             if (_firstPacket[0] != 5)
             {
-                response = new byte[] { 0, 91 };
-                Console.WriteLine("socks 4/5 protocol error");
+                var response = new byte[] { 0, 91 };
+                Console.WriteLine("socks 5 protocol error");
                 _connection.Send(response);
                 Close();
                 return;
             }
-            bool no_auth = false;
-            bool auth = false;
-            bool has_method = false;
+
+            bool client_support_auth = false;
             for (int index = 0; index < _firstPacket[1]; ++index)
             {
-                if (_firstPacket[2 + index] == 0)
+                if (_firstPacket[2 + index] == 2)
                 {
-                    no_auth = true;
-                    has_method = true;
-                }
-                else if (_firstPacket[2 + index] == 2)
-                {
-                    auth = true;
-                    has_method = true;
+                    client_support_auth = true;
                 }
             }
-            if (!has_method)
-            {
-                Console.WriteLine("Socks5 no acceptable auth method");
-                Close();
-                return;
-            }
-            if (auth || !no_auth)
-            {
-                response[1] = 2;
-                _connection.Send(response);
-                HandshakeAuthReceiveCallback();
-            }
-            else if (no_auth && (string.IsNullOrEmpty(_config.authUser)
-                || Util.Utils.isMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8")))
-            {
-                _connection.Send(response);
-                HandshakeReceive2Callback();
-            }
-            else
-            {
-                Console.WriteLine("Socks5 Auth failed");
-                Close();
-            }
-        }
 
-        private void HandshakeAuthReceiveCallback()
-        {
-            try
+            if (!client_support_auth)
             {
-                int bytesRead = _connection.Receive(_connetionRecvBuffer, 1024, 0); //_connection.EndReceive(ar);
-
-                if (bytesRead >= 3)
+                if (AuthConnection(_connection, null, null))
                 {
-                    byte user_len = _connetionRecvBuffer[1];
-                    byte pass_len = _connetionRecvBuffer[user_len + 2];
-                    byte[] response = { 1, 0 };
-                    string user = Encoding.UTF8.GetString(_connetionRecvBuffer, 2, user_len);
-                    string pass = Encoding.UTF8.GetString(_connetionRecvBuffer, user_len + 3, pass_len);
-                    if (AuthConnection(_connection, user, pass))
-                    {
-                        _connection.Send(response);
-                        HandshakeReceive2Callback();
-                    }
+                    byte[] response = { 5, 0 }; //socks5无需认证
+                    _connection.Send(response);
+                    HandshakeReceive2Callback();
+                    return;
                 }
                 else
                 {
-                    Console.WriteLine("failed to recv data in HandshakeAuthReceiveCallback");
+                    byte[] response = { 5, 0xFF }; //0xFF 无支持的认证方法
+                    _connection.Send(response);
                     Close();
+                    return;
                 }
+            }
+            else
+            {
+
+                if (ReqSocks5Pasword())
+                {
+                    HandshakeReceive2Callback();
+                    return;
+                }
+                else
+                {
+                    Close();
+                    return;
+                }
+            }
+
+
+        }
+
+        private bool ReqSocks5Pasword()
+        {
+            try
+            {
+
+                byte[] req = { 5, 2 }; //请求账号密码认证
+                _connection.Send(req);
+
+                int bytesRead = _connection.Receive(_connetionRecvBuffer, 1024, 0); //_connection.EndReceive(ar);
+
+                if (bytesRead < 3)
+                {
+                    Console.WriteLine("failed to recv data in HandshakeAuthReceiveCallback");
+                    return false;
+                }
+
+                byte user_len = _connetionRecvBuffer[1];
+                byte pass_len = _connetionRecvBuffer[user_len + 2];
+
+                var user = Encoding.UTF8.GetString(_connetionRecvBuffer, 2, user_len);
+                var pass = Encoding.UTF8.GetString(_connetionRecvBuffer, user_len + 3, pass_len);
+                if (AuthConnection(_connection, user, pass))
+                {
+                    byte[] response = { 1, 0 }; //认证成功
+                    _connection.Send(response);
+                    return true;
+                }
+                else
+                {
+                    byte[] response = { 1, 1 };//认证失败
+                    _connection.Send(response);
+                    return false;
+                }
+
             }
             catch (Exception e)
             {
                 Logging.LogUsefulException(e);
                 Close();
             }
+
+            return false;
         }
+
 
         private void HandshakeReceive2Callback()
         {
