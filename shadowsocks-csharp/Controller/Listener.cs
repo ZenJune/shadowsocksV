@@ -254,13 +254,13 @@ namespace Shadowsocks.Controller
             {
                 Socket conn = listener.EndAccept(ar);
 
-                if (!_shareOverLAN && !Util.Utils.isLocal(conn))
+                if (!_shareOverLAN && !Util.Utils.isFromLocal(conn))
                 {
                     conn.Shutdown(SocketShutdown.Both);
                     conn.Close();
                 }
 
-                if ((_authUser ?? "").Length == 0 && !Util.Utils.isLAN(conn))
+                if ((_authUser ?? "").Length == 0 && !Util.Utils.isFromLAN(conn))
                 {
                     conn.Shutdown(SocketShutdown.Both);
                     conn.Close();

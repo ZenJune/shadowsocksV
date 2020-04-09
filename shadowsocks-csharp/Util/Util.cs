@@ -178,39 +178,11 @@ namespace Shadowsocks.Util
         }
 
         public static bool isLocal(IPAddress ip)
-        {
-            byte[] addr = ip.GetAddressBytes();
-            if (addr.Length == 4)
-            {
-                string[] netmasks = new string[]
-                {
-                    "127.0.0.0/8",
-                    "169.254.0.0/16",
-                };
-                foreach (string netmask in netmasks)
-                {
-                    if (isMatchSubNet(ip, netmask))
-                        return true;
-                }
-                return false;
-            }
-            else if (addr.Length == 16)
-            {
-                string[] netmasks = new string[]
-                {
-                    "::1/128",
-                };
-                foreach (string netmask in netmasks)
-                {
-                    if (isMatchSubNet(ip, netmask))
-                        return true;
-                }
-                return false;
-            }
-            return true;
+        {            
+            return IPAddress.IsLoopback(ip);
         }
 
-        public static bool isLocal(Socket socket)
+        public static bool isFromLocal(Socket socket)
         {
             return isLocal(((IPEndPoint)socket.RemoteEndPoint).Address);
         }
@@ -262,7 +234,7 @@ namespace Shadowsocks.Util
             return true;
         }
 
-        public static bool isLAN(Socket socket)
+        public static bool isFromLAN(Socket socket)
         {
             return isLAN(((IPEndPoint)socket.RemoteEndPoint).Address);
         }
