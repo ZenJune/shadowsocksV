@@ -55,8 +55,7 @@ namespace Shadowsocks.View
         private PortSettingsForm portMapForm;
         private SubscribeForm subScribeForm;
         private LogForm logForm;
-        private string _urlToOpen;
-        private System.Timers.Timer timerDelayCheckUpdate;
+        private string _urlToOpen; 
 
         public MenuViewController(ShadowsocksController controller)
         {
@@ -97,26 +96,10 @@ namespace Shadowsocks.View
                 updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.isDefaultConfig());
             }
 
-            timerDelayCheckUpdate = new System.Timers.Timer(1000.0 * 10);
-            timerDelayCheckUpdate.Elapsed += timer_Elapsed;
-            timerDelayCheckUpdate.Start();
+       
         }
 
-        private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (timerDelayCheckUpdate != null)
-            {
-                if (timerDelayCheckUpdate.Interval <= 1000.0 * 30)
-                {
-                    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 5;
-                }
-                else
-                {
-                    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 2;
-                }
-            }
-            updateChecker.CheckUpdate(controller.GetCurrentConfiguration());
-        }
+     
 
         void controller_Errored(object sender, System.IO.ErrorEventArgs e)
         {
@@ -561,11 +544,7 @@ namespace Shadowsocks.View
                 {
                     ShowBalloonTip(String.Format(I18N.GetString("{0} {1} Update Found"), UpdateChecker.Name, updateChecker.LatestVersionNumber),
                         I18N.GetString("Click menu to download"), ToolTipIcon.Info, 10000);
-                    _notifyIcon.BalloonTipClicked += notifyIcon1_BalloonTipClicked;
-
-                    timerDelayCheckUpdate.Elapsed -= timer_Elapsed;
-                    timerDelayCheckUpdate.Stop();
-                    timerDelayCheckUpdate = null;
+                    _notifyIcon.BalloonTipClicked += notifyIcon1_BalloonTipClicked; 
                 }
                 this.UpdateItem.Visible = true;
                 this.UpdateItem.Text = String.Format(I18N.GetString("New version {0} {1} available"), UpdateChecker.Name, updateChecker.LatestVersionNumber);
@@ -897,12 +876,7 @@ namespace Shadowsocks.View
                 serverLogForm.Close();
                 serverLogForm = null;
             }
-            if (timerDelayCheckUpdate != null)
-            {
-                timerDelayCheckUpdate.Elapsed -= timer_Elapsed;
-                timerDelayCheckUpdate.Stop();
-                timerDelayCheckUpdate = null;
-            }
+          
             _notifyIcon.Visible = false;
             Application.Exit();
         }
