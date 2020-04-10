@@ -35,7 +35,7 @@ namespace Shadowsocks.Encryption
                 string dllPath = Path.Combine(runningPath, "libeay32.dll");
                 try
                 {
-                    //FileManager.UncompressFile(dllPath, Resources.libsscrypto_dll);
+                    FileManager.UncompressFile(dllPath, Resources.libsscrypto_dll);
                     LoadLibrary(dllPath);
                 }
                 catch (IOException)
