@@ -26,7 +26,6 @@ namespace Shadowsocks.View
 
         private ShadowsocksController controller;
         private UpdateChecker updateChecker;
-        private UpdateFreeNode updateFreeNodeChecker;
         private UpdateSubscribeManager updateSubscribeManager;
 
         private NotifyIcon _notifyIcon;
@@ -55,7 +54,7 @@ namespace Shadowsocks.View
         private PortSettingsForm portMapForm;
         private SubscribeForm subScribeForm;
         private LogForm logForm;
-        private string _urlToOpen; 
+        private string _urlToOpen;
 
         public MenuViewController(ShadowsocksController controller)
         {
@@ -83,23 +82,23 @@ namespace Shadowsocks.View
             updateChecker = new UpdateChecker();
             updateChecker.NewVersionFound += updateChecker_NewVersionFound;
 
-            updateFreeNodeChecker = new UpdateFreeNode();
-            updateFreeNodeChecker.NewFreeNodeFound += updateFreeNodeChecker_NewFreeNodeFound;
+
+
 
             updateSubscribeManager = new UpdateSubscribeManager();
-
+            updateSubscribeManager.NewFreeNodeFound += updateFreeNodeChecker_NewFreeNodeFound;
             LoadCurrentConfiguration();
 
             Configuration cfg = controller.GetCurrentConfiguration();
             if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
             {
-                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.isDefaultConfig());
+                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), -1, !cfg.isDefaultConfig());
             }
 
-       
+
         }
 
-     
+
 
         void controller_Errored(object sender, System.IO.ErrorEventArgs e)
         {
@@ -317,10 +316,10 @@ namespace Shadowsocks.View
         void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
             int count = 0;
-            if (!String.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
+            if (!String.IsNullOrEmpty(updateSubscribeManager.FreeNodeResult))
             {
                 List<string> urls = new List<string>();
-                updateFreeNodeChecker.FreeNodeResult = updateFreeNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
+                updateSubscribeManager.FreeNodeResult = updateSubscribeManager.FreeNodeResult.TrimEnd('\r', '\n', ' ');
                 Configuration config = controller.GetCurrentConfiguration();
                 Server selected_server = null;
                 if (config.index >= 0 && config.index < config.configs.Count)
@@ -329,15 +328,15 @@ namespace Shadowsocks.View
                 }
                 try
                 {
-                    updateFreeNodeChecker.FreeNodeResult = Util.Base64.DecodeBase64(updateFreeNodeChecker.FreeNodeResult);
+                    updateSubscribeManager.FreeNodeResult = Util.Base64.DecodeBase64(updateSubscribeManager.FreeNodeResult);
                 }
                 catch
                 {
-                    updateFreeNodeChecker.FreeNodeResult = "";
+                    updateSubscribeManager.FreeNodeResult = "";
                 }
                 int max_node_num = 0;
 
-                Match match_maxnum = Regex.Match(updateFreeNodeChecker.FreeNodeResult, "^MAX=([0-9]+)");
+                Match match_maxnum = Regex.Match(updateSubscribeManager.FreeNodeResult, "^MAX=([0-9]+)");
                 if (match_maxnum.Success)
                 {
                     try
@@ -349,7 +348,7 @@ namespace Shadowsocks.View
 
                     }
                 }
-                URL_Split(updateFreeNodeChecker.FreeNodeResult, ref urls);
+                URL_Split(updateSubscribeManager.FreeNodeResult, ref urls);
                 for (int i = urls.Count - 1; i >= 0; --i)
                 {
                     if (!urls[i].StartsWith("ssr"))
@@ -519,7 +518,7 @@ namespace Shadowsocks.View
             if (count > 0)
             {
                 ShowBalloonTip(I18N.GetString("Success"),
-                    I18N.GetString("Update subscribe SSR node success"), ToolTipIcon.Info, 10000);
+                    I18N.GetString("Update subscribe SSR node success" + $"--count: {count}"), ToolTipIcon.Info, 10000);
             }
             else
             {
@@ -544,7 +543,7 @@ namespace Shadowsocks.View
                 {
                     ShowBalloonTip(String.Format(I18N.GetString("{0} {1} Update Found"), UpdateChecker.Name, updateChecker.LatestVersionNumber),
                         I18N.GetString("Click menu to download"), ToolTipIcon.Info, 10000);
-                    _notifyIcon.BalloonTipClicked += notifyIcon1_BalloonTipClicked; 
+                    _notifyIcon.BalloonTipClicked += notifyIcon1_BalloonTipClicked;
                 }
                 this.UpdateItem.Visible = true;
                 this.UpdateItem.Text = String.Format(I18N.GetString("New version {0} {1} available"), UpdateChecker.Name, updateChecker.LatestVersionNumber);
@@ -876,7 +875,7 @@ namespace Shadowsocks.View
                 serverLogForm.Close();
                 serverLogForm = null;
             }
-          
+
             _notifyIcon.Visible = false;
             Application.Exit();
         }
@@ -1061,12 +1060,12 @@ namespace Shadowsocks.View
 
         private void CheckNodeUpdate_Click(object sender, EventArgs e)
         {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, true);
+            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), -1, true);
         }
 
         private void CheckNodeUpdateBypassProxy_Click(object sender, EventArgs e)
         {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, false);
+            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), -1, false);
         }
 
         private void ShowLogItem_Click(object sender, EventArgs e)
