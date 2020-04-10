@@ -441,7 +441,8 @@ namespace Shadowsocks.Controller
                         services.Add(new HttpPortForwarder(polipoRunner.RunningPort, _config));
 #endif
                         _listener = new Listener(services);
-                        _listener.Start(_config, 0);
+                        _listener.Config = _config;
+                        _listener.Start( 0);
                     }
                     break;
                 }
@@ -484,7 +485,8 @@ namespace Shadowsocks.Controller
                     List<Listener.Service> services = new List<Listener.Service>();
                     services.Add(local);
                     Listener listener = new Listener(services);
-                    listener.Start(_config, pair.Key);
+                    listener.Config = _config;
+                    listener.Start( pair.Key);
                     _port_map_listener.Add(listener);
                 }
                 catch (Exception e)

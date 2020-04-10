@@ -1,4 +1,5 @@
 ﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -16,10 +17,12 @@ namespace Shadowsocks.Controller
             bool Handle(byte[] firstPacket, int length, Socket socket);
         }
 
-        Configuration _config;
-        bool _shareOverLAN;
-        string _authUser;
-        string _authPass;
+        public Configuration Config { get; set; }
+        bool ShareOverLAN => Config.shareOverLan;
+        string AuthUser => Config.authUser;
+        string AuthPass => Config.authPass; 
+
+
         Socket _socket;
         Socket _socket_v6;
         bool _stop;
@@ -60,15 +63,15 @@ namespace Shadowsocks.Controller
             return false;
         }
 
-        public bool isConfigChange(Configuration config)
+        public bool isConfigChange(Configuration argConfig)
         {
             try
             {
-                if (this._shareOverLAN != config.shareOverLan
-                    || _authUser != config.authUser
-                    || _authPass != config.authPass
+                if (this.ShareOverLAN != argConfig.shareOverLan
+                    || AuthUser != argConfig.authUser
+                    || AuthPass != argConfig.authPass
                     || _socket == null
-                    || ((IPEndPoint)_socket.LocalEndPoint).Port != config.localPort)
+                    || _socket.LocalPort() != argConfig.localPort)
                 {
                     return true;
                 }
@@ -78,15 +81,12 @@ namespace Shadowsocks.Controller
             return false;
         }
 
-        public void Start(Configuration config, int port)
+        public void Start(int port = 0)
         {
-            this._config = config;
-            this._shareOverLAN = config.shareOverLan;
-            this._authUser = config.authUser;
-            this._authPass = config.authPass;
+
             _stop = false;
 
-            int localPort = port == 0 ? _config.localPort : port;
+            int localPort = port == 0 ? Config.localPort : port;
             if (CheckIfPortInUse(localPort))
                 throw new Exception(I18N.GetString("Port already in use"));
 
@@ -254,13 +254,13 @@ namespace Shadowsocks.Controller
             {
                 Socket conn = listener.EndAccept(ar);
 
-                if (!_shareOverLAN && !Util.Utils.isFromLocal(conn))
+                if (!ShareOverLAN && !Util.Utils.isFromLocal(conn))
                 {
                     conn.Shutdown(SocketShutdown.Both);
                     conn.Close();
                 }
 
-                if ((_authUser ?? "").Length == 0 && !Util.Utils.isFromLAN(conn))
+                if (string.IsNullOrEmpty(AuthUser) && !Util.Utils.isFromLAN(conn))
                 {
                     conn.Shutdown(SocketShutdown.Both);
                     conn.Close();
@@ -274,7 +274,7 @@ namespace Shadowsocks.Controller
                     };
 
                     int local_port = ((IPEndPoint)conn.LocalEndPoint).Port;
-                    if (!_config.GetPortMapCache().ContainsKey(local_port) || _config.GetPortMapCache()[local_port].type != PortMapType.Forward)
+                    if (!Config.GetPortMapCache().ContainsKey(local_port) || Config.GetPortMapCache()[local_port].type != PortMapType.Forward)
                     {
                         conn.BeginReceive(buf, 0, buf.Length, 0,
                             new AsyncCallback(ReceiveCallback), state);
