@@ -117,14 +117,23 @@ namespace Shadowsocks.View
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
-            try
+
+            if (File.Exists("icon.png"))
             {
-                using (Bitmap icon = new Bitmap("icon.png"))
+                using (Bitmap _icon = new Bitmap("icon.png"))
                 {
-                    _notifyIcon.Icon = Icon.FromHandle(icon.GetHicon());
+                    try
+                    {
+                        _notifyIcon.Icon = Icon.FromHandle(_icon.GetHicon());
+                    }
+                    catch
+                    {
+                    }
                 }
             }
-            catch
+
+
+            if (_notifyIcon.Icon == null)
             {
                 Bitmap icon = null;
                 if (dpi < 97)
@@ -172,7 +181,7 @@ namespace Shadowsocks.View
                     }
                     _notifyIcon.Icon = Icon.FromHandle(iconCopy.GetHicon());
                 }
-            }
+            } 
 
             // we want to show more details but notify icon title is limited to 63 characters
             string text = (enabled ?

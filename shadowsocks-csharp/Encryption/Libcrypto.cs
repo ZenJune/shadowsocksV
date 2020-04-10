@@ -14,28 +14,25 @@ namespace Shadowsocks.Encryption
         const string DLLNAME = "libeay32";
         static Dictionary<string, EncryptFunc> encrypt_func_map;
 
+     
         static Libcrypto()
         {
             try
-            {
-                //try
-                //{
-                //    dlopen("libcrypto.so", 2);
-                //    return;
-                //}
-                //catch (Exception e)
-                //{
-                //    //Console.WriteLine(e.ToString());
-                //}
-                string runningPath = Path.Combine(System.Windows.Forms.Application.StartupPath, @"temp"); // Path.GetTempPath();
-                if (!Directory.Exists(runningPath))
-                {
-                    Directory.CreateDirectory(runningPath);
-                }
+            { 
+                string runningPath = Path.Combine(System.Windows.Forms.Application.StartupPath ); // Path.GetTempPath();
+            
                 string dllPath = Path.Combine(runningPath, "libeay32.dll");
                 try
                 {
-                    FileManager.UncompressFile(dllPath, Resources.libsscrypto_dll);
+                    if(Util.Utils.IsX64())
+                    {
+                        FileManager.ByteArrayToFile(dllPath, Resources.libeay32x64_dll);
+                    }
+                    else
+                    {
+                        FileManager.ByteArrayToFile(dllPath, Resources.libeay32x86_dll);
+                    }
+               
                     LoadLibrary(dllPath);
                 }
                 catch (IOException)
@@ -58,7 +55,6 @@ namespace Shadowsocks.Encryption
                 }
             }
         }
-
         public static bool isSupport()
         {
             try

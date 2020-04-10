@@ -84,11 +84,31 @@ namespace Shadowsocks.Properties {
         ///Servers Subscribe=服务器订阅
         ///Subscribe setting...=SSR服务器订阅设置...
         ///Update subscribe SSR node=更新SSR服务器订阅
-        ///Update subscribe SSR node(bypass pro [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///Update subscr [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string cn {
             get {
                 return ResourceManager.GetString("cn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
+        internal static byte[] libeay32x64_dll {
+            get {
+                object obj = ResourceManager.GetObject("libeay32x64_dll", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
+        internal static byte[] libeay32x86_dll {
+            get {
+                object obj = ResourceManager.GetObject("libeay32x86_dll", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

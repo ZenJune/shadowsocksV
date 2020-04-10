@@ -48,7 +48,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
+    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -296,6 +296,8 @@
     <None Include="Resources\ss16.png" />
     <None Include="Resources\ss24.png" />
     <None Include="Resources\ssw128.png" />
+    <None Include="bin\4.0\Debug\temp\libeay32x64.dll" />
+    <None Include="bin\4.0\Debug\temp\libeay32x86.dll" />
     <Content Include="Data\cn.txt" />
     <None Include="Data\privoxy_conf.txt" />
     <Content Include="Data\user-rule.txt" />

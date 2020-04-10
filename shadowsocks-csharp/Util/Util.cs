@@ -31,7 +31,10 @@ namespace Shadowsocks.Util
                 return dnsBuffer;
             }
         }
-
+        static public bool IsX64()
+        {
+            return IntPtr.Size == 8;
+        }
         static Process current_process = Process.GetCurrentProcess();
 
         public static void ReleaseMemory()
@@ -179,7 +182,7 @@ namespace Shadowsocks.Util
         }
 
         public static bool isLocal(IPAddress ip)
-        {            
+        {
             return IPAddress.IsLoopback(ip);
         }
 
@@ -235,7 +238,7 @@ namespace Shadowsocks.Util
             return true;
         }
 
-       static  SegmentIPOrderList _SegIPList_LAN;
+        static SegmentIPOrderList _SegIPList_LAN;
         public static bool isLAN(IPAddress ip)
         {
             if (_SegIPList_LAN == null)
@@ -257,7 +260,7 @@ namespace Shadowsocks.Util
                     //"203.0.113.0/24",
                 };
                 netmasks.ToList().ForEach(s => _SegIPList_LAN.Add(new SegmentIP(s)));
-            } 
+            }
             var rst = _SegIPList_LAN.IsInList(ip);
             return rst;
 

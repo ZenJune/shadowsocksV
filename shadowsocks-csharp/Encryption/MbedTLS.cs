@@ -66,7 +66,7 @@ namespace Shadowsocks.Encryption
         static MbedTLS()
         {
             string path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string runningPath = Path.Combine(new Uri(path).LocalPath, @"temp"); // Path.GetTempPath(); 
+            string runningPath = Path.Combine(new Uri(path).LocalPath); // Path.GetTempPath(); 
             if (!Directory.Exists(runningPath))
             {
                 Directory.CreateDirectory(runningPath);

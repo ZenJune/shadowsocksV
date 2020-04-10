@@ -16,6 +16,7 @@ namespace Shadowsocks.Controller
                    new System.IO.FileStream(fileName, System.IO.FileMode.Create,
                                             System.IO.FileAccess.Write);
                 _FileStream.Write(content, 0, content.Length);
+                _FileStream.Flush();
                 _FileStream.Close();
                 return true;
             }
