@@ -19,8 +19,7 @@ using Shadowsocks.Model;
 namespace Shadowsocks.Util
 {
     public class Utils
-    {
-        private delegate IPHostEntry GetHostEntryHandler(string ip);
+    { 
 
         private static LRUCache<string, IPAddress> dnsBuffer = new LRUCache<string, IPAddress>();
 
@@ -411,18 +410,19 @@ namespace Shadowsocks.Util
                 }
                 {
                     try
-                    {
-                        GetHostEntryHandler callback = new GetHostEntryHandler(Dns.GetHostEntry);
-                        IAsyncResult result = callback.BeginInvoke(host, null, null);
-                        if (result.AsyncWaitHandle.WaitOne(10000, true))
+                    { 
+
+                        var taskiplist = Dns.GetHostAddressesAsync(host);
+                        var isok = taskiplist.Wait(10000);
+                        if (isok)
                         {
-                            IPHostEntry ipHostEntry = callback.EndInvoke(result);
-                            foreach (IPAddress ad in ipHostEntry.AddressList)
+                            var iplist = taskiplist.Result;
+                            foreach (IPAddress ad in iplist)
                             {
                                 if (ad.AddressFamily == AddressFamily.InterNetwork)
                                     return ad;
                             }
-                            foreach (IPAddress ad in ipHostEntry.AddressList)
+                            foreach (IPAddress ad in iplist)
                             {
                                 return ad;
                             }
